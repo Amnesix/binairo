@@ -5,7 +5,7 @@
 # Jean MORLET
 # ---------------------------------------------
 # main.py
-# Le jeu
+# Lancement du jeu et contrôle au clavier.
 # =============================================
 
 from modele import ModeleBinairo
