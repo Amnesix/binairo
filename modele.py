@@ -33,7 +33,7 @@ class ModeleBinairo:
             self._array[row][col] = None
 
     def clear(self):
-        self._array = [[None]*6 for _ in range(6)]
+        self._array = [[None]*self._dim for _ in range(self._dim)]
 
     def getNbInRow(self, r):
         return sum([1 if self._array[r][c] is not None else 0 for c in range(self._dim)])

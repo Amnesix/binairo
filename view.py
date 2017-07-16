@@ -14,6 +14,8 @@ from tkinter import *
 OFFSET = 5
 LIGHTRED = '#FF8080'
 
+CASE = 35
+
 class ViewerBinairo(Frame):
 
     def __init__(self, parent, dim, m, c):
@@ -29,8 +31,8 @@ class ViewerBinairo(Frame):
         self._arrays = []
         self._parent.title("Binairo")
         self.pack(fill=BOTH, expand=True)
-        self._canvas = Canvas(self, width=16+50*self._dim,
-                              height=16+50*self._dim)
+        self._canvas = Canvas(self, width=16+CASE*self._dim,
+                              height=16+CASE*self._dim)
         self._canvas.grid(row=0, column=0, sticky="news")
 
         frame = Frame(self, relief=RAISED, borderwidth=1, background='lightgrey')
@@ -69,17 +71,18 @@ class ViewerBinairo(Frame):
             self.affiche(self._m.getArray())
 
     def onMouseClick(self, evt):
-        row = (evt.x - OFFSET) // 50
-        col = (evt.y - OFFSET) // 50
+        row = (evt.x - OFFSET) // CASE
+        col = (evt.y - OFFSET) // CASE
         if self._c.modify(row=row, col=col):
             self.affiche(self._m.getArray(), row, col, self._c.verify())
 
     def findSoluce(self):
+        self.push()
         if self._c.findSoluce():
             self.affiche(self._m.getArray(), None, None, [])
             self._labelText.set("Solution trouvée :)")
         else:
-            self._labelText.set("Solution impossible")
+            self._labelText.set("Solution impossible :(")
 
     def affiche(self, ar=None, row=None, col=None, errors=[]):
         self._row = self._row if row is None else row
@@ -90,42 +93,51 @@ class ViewerBinairo(Frame):
             for tt in errors:
                 if tt[0] == 'R':
                     for i in tt[1:]:
-                        self._canvas.create_rectangle(OFFSET+i*50+1, OFFSET+1,
-                                                      OFFSET+i*50+50, OFFSET+300,
+                        self._canvas.create_rectangle(OFFSET+i*CASE+1, OFFSET+1,
+                                                      OFFSET+i*CASE+CASE,
+                                                      OFFSET+self._dim*CASE,
                                                       fill=LIGHTRED, width=0)
                 elif tt[0] == 'C':
                     for i in tt[1:]:
-                        self._canvas.create_rectangle(OFFSET+1, OFFSET+i*50+1,
-                                                      OFFSET+300, OFFSET+i*50+50,
+                        self._canvas.create_rectangle(OFFSET+1, OFFSET+i*CASE+1,
+                                                      OFFSET+self._dim*CASE,
+                                                      OFFSET+i*CASE+CASE,
                                                       fill=LIGHTRED, width=0)
                 elif tt[0] == 'r':
-                    self._canvas.create_rectangle(OFFSET+tt[1]*50+1,
-                                                  OFFSET+tt[2]*50+1,
-                                                  OFFSET+tt[1]*50+50,
-                                                  OFFSET+tt[3]*50+50,
+                    self._canvas.create_rectangle(OFFSET+tt[1]*CASE+1,
+                                                  OFFSET+tt[2]*CASE+1,
+                                                  OFFSET+tt[1]*CASE+CASE,
+                                                  OFFSET+tt[3]*CASE+CASE,
                                                   fill=LIGHTRED, width=0)
                 elif tt[0] == 'c':
-                    self._canvas.create_rectangle(OFFSET+tt[2]*50+1,
-                                                  OFFSET+tt[1]*50+1,
-                                                  OFFSET+tt[3]*50+50,
-                                                  OFFSET+tt[1]*50+50,
+                    self._canvas.create_rectangle(OFFSET+tt[2]*CASE+1,
+                                                  OFFSET+tt[1]*CASE+1,
+                                                  OFFSET+tt[3]*CASE+CASE,
+                                                  OFFSET+tt[1]*CASE+CASE,
                                                   fill=LIGHTRED, width=0)
         if row is not None and col is not None:
-            self._canvas.create_rectangle(OFFSET+row*50+2, OFFSET+col*50+2,
-                                          OFFSET+row*50+48, OFFSET+col*50+48,
+            self._canvas.create_rectangle(OFFSET+row*CASE+2, OFFSET+col*CASE+2,
+                                          OFFSET+row*CASE+CASE-2,
+                                          OFFSET+col*CASE+CASE-2,
                                           width=3, outline='yellow')
-        for i in range(7):
-            self._canvas.create_line(OFFSET+0, OFFSET+i*50, OFFSET+300, OFFSET+i*50)
-            self._canvas.create_line(OFFSET+i*50, OFFSET+0, OFFSET+i*50, OFFSET+300)
+        for i in range((self._dim+1)*CASE):
+            self._canvas.create_line(OFFSET+0, OFFSET+i*CASE,
+                                     OFFSET+CASE*self._dim, OFFSET+i*CASE)
+            self._canvas.create_line(OFFSET+i*CASE, OFFSET+0, OFFSET+i*CASE,
+                                     OFFSET+CASE*self._dim)
         if ar is not None:
             for r in range(len(ar)):
                 for c in range(len(ar[r])):
                     v = ar[r][c]
                     if v == 0:
-                        self._canvas.create_oval(OFFSET+r*50+10, OFFSET+c*50+10,
-                                                 OFFSET+r*50+40, OFFSET+c*50+40,
+                        self._canvas.create_oval(OFFSET+r*CASE+6,
+                                                 OFFSET+c*CASE+6,
+                                                 OFFSET+r*CASE+CASE-6,
+                                                 OFFSET+c*CASE+CASE-6,
                                                  fill='blue')
                     elif v == 1:
-                        self._canvas.create_line(OFFSET+r*50+25, OFFSET+c*50+10,
-                                                 OFFSET+r*50+25, OFFSET+c*50+40,
+                        self._canvas.create_line(OFFSET+r*CASE+CASE//2,
+                                                 OFFSET+c*CASE+6,
+                                                 OFFSET+r*CASE+CASE//2,
+                                                 OFFSET+c*CASE+CASE-6,
                                                  width=7, fill='blue')

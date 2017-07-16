@@ -14,7 +14,7 @@ from view import ViewerBinairo
 from tkinter import *
 import sys
 
-DIM = 6
+DIM = 8
 
 
 def main():

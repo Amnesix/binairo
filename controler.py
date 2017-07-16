@@ -37,7 +37,7 @@ class ControlerBinairo:
     def modify(self, row=None, col=None):
         return self._m.incRC(self._row if row is None else row,
                              self._col if col is None else col)
-    
+
     def verify(self):
         errors = []
         ar = self._m.getArray()
@@ -45,7 +45,7 @@ class ControlerBinairo:
         rows = []
         # Recherche des lignes identiques ou à plus de _dim/2 éléments
         # identiques
-        for r in range(len(ar)):
+        for r in range(self._dim):
             if sum([1 if c is not None else 0 for c in ar[r]]) == self._dim:
                 if len(rows):
                     for i in rows:
@@ -73,8 +73,8 @@ class ControlerBinairo:
                     pass
         # Recherche des colonnes identiques
         COLS = self._m.getCols()
-        for c in range(len(ar[0])):
-            if sum([1 if ar[r][c] is not None else 0 for r in range(len(ar))]) == 6:
+        for c in range(self._dim):
+            if sum([1 if ar[r][c] is not None else 0 for r in range(self._dim)]) == 6:
                 if len(cols):
                     for i in cols:
                         if COLS[c] == COLS[i]:
@@ -104,7 +104,7 @@ class ControlerBinairo:
 
     def push(self):
         self._arrays.append(self._m.getArray())
-        
+
     def pop(self):
         if len(self._arrays) > 0:
             self._m.setArray([r[:] for r in self._arrays.pop()])
