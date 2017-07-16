@@ -14,18 +14,18 @@ from view import ViewerBinairo
 from tkinter import *
 import sys
 
-DIM = 8
+DIM = 6
 
 
-def main():
+def main(dim):
     global m, v, c
 
-    m = ModeleBinairo(DIM)
-    c = ControlerBinairo(DIM, m)
+    m = ModeleBinairo(dim)
+    c = ControlerBinairo(dim, m)
 
     root = Tk()
-    root.geometry("316x366")
-    v = ViewerBinairo(root, DIM, m, c)
+    root.geometry()
+    v = ViewerBinairo(root, dim, m, c)
     root.bind('<Up>', lambda e: up())
     root.bind('<Down>', lambda e: down())
     root.bind('<Left>', lambda e: left())
@@ -66,4 +66,12 @@ def right():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        dim = DIM if len(sys.argv) == 1 else int(sys.argv[1])
+    except ValueError:
+        print("Le paramètre doit être 6, 8, 10 ou 12")
+        sys.exit()
+    if not dim in [6, 8, 10, 12]:
+        print("Le paramètre doit être 6, 8, 10 ou 12")
+    else:
+        main(dim)

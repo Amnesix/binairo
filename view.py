@@ -89,6 +89,7 @@ class ViewerBinairo(Frame):
         self._col = self._col if col is None else col
         self._canvas.delete("all")
         self._labelText.set('')
+        # Affichage des erreurs
         if errors is not None:
             for tt in errors:
                 if tt[0] == 'R':
@@ -115,26 +116,29 @@ class ViewerBinairo(Frame):
                                                   OFFSET+tt[3]*CASE+CASE,
                                                   OFFSET+tt[1]*CASE+CASE,
                                                   fill=LIGHTRED, width=0)
+        # Affichage du curseur
         if row is not None and col is not None:
             self._canvas.create_rectangle(OFFSET+row*CASE+2, OFFSET+col*CASE+2,
                                           OFFSET+row*CASE+CASE-2,
                                           OFFSET+col*CASE+CASE-2,
                                           width=3, outline='yellow')
-        for i in range((self._dim+1)*CASE):
+        # Affichage des lignes du plateau
+        for i in range(self._dim+1):
             self._canvas.create_line(OFFSET+0, OFFSET+i*CASE,
                                      OFFSET+CASE*self._dim, OFFSET+i*CASE)
             self._canvas.create_line(OFFSET+i*CASE, OFFSET+0, OFFSET+i*CASE,
                                      OFFSET+CASE*self._dim)
+        # Affichage des pièces.
         if ar is not None:
             for r in range(len(ar)):
                 for c in range(len(ar[r])):
                     v = ar[r][c]
                     if v == 0:
-                        self._canvas.create_oval(OFFSET+r*CASE+6,
-                                                 OFFSET+c*CASE+6,
-                                                 OFFSET+r*CASE+CASE-6,
-                                                 OFFSET+c*CASE+CASE-6,
-                                                 fill='blue')
+                        self._canvas.create_oval(OFFSET+r*CASE+8,
+                                                 OFFSET+c*CASE+8,
+                                                 OFFSET+r*CASE+CASE-8,
+                                                 OFFSET+c*CASE+CASE-8,
+                                                 width=5, outline='blue')
                     elif v == 1:
                         self._canvas.create_line(OFFSET+r*CASE+CASE//2,
                                                  OFFSET+c*CASE+6,

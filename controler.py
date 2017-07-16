@@ -74,7 +74,7 @@ class ControlerBinairo:
         # Recherche des colonnes identiques
         COLS = self._m.getCols()
         for c in range(self._dim):
-            if sum([1 if ar[r][c] is not None else 0 for r in range(self._dim)]) == 6:
+            if sum([1 if ar[r][c] is not None else 0 for r in range(self._dim)]) == self._dim:
                 if len(cols):
                     for i in cols:
                         if COLS[c] == COLS[i]:
