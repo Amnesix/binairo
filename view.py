@@ -13,8 +13,8 @@ from tkinter import *
 
 OFFSET = 5
 LIGHTRED = '#FF8080'
-
 CASE = 35
+
 
 class ViewerBinairo(Frame):
 

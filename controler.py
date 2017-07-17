@@ -112,6 +112,7 @@ class ControlerBinairo:
         return False
 
     def findSoluce(self):
+        """ Recherche d'une solution par force brute """
         self.push()
         def helper():
             if len(self.verify()) > 0:
