@@ -113,11 +113,12 @@ class ControlerBinairo:
 
     def findSoluce(self):
         """ Recherche d'une solution par force brute """
-        self.push()
+        self._soluce = []
         def helper():
             if len(self.verify()) > 0:
                 return False
             if self._m.getNbInArray() == self._dim ** 2:
+                self._soluce = self._m.getArray()
                 return True
             ar = self._m.getArray()
             for r in range(self._dim):
@@ -126,14 +127,18 @@ class ControlerBinairo:
                         self.push()
                         self.modify(r, c)
                         if helper():
+                            self.pop()
                             return True
                         self.modify(r, c)
                         if helper():
+                            self.pop()
                             return True
                         self.pop()
                         return False
+        self.push()
         soluce = helper()
-        self._arrays.clear()
+        # self._arrays.clear()
+        self._m.setArray(self._soluce)
         return soluce
 
     def getRow(self):
