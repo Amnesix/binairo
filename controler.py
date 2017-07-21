@@ -11,6 +11,7 @@
 # Indique la fin du jeu.
 # =============================================
 import modele
+import time
 
 
 class ControlerBinairo:
@@ -39,6 +40,10 @@ class ControlerBinairo:
                              self._col if col is None else col)
 
     def verify(self):
+        """
+        Fonction permettant de vérifier si un grille est correct
+        ainsi que de retourner la liste des erreurs.
+        """
         errors = []
         ar = self._m.getArray()
         cols = []
@@ -113,6 +118,7 @@ class ControlerBinairo:
 
     def findSoluce(self):
         """ Recherche d'une solution par force brute """
+        debut = time.time()
         self._soluce = []
         def helper():
             if len(self.verify()) > 0:
@@ -139,7 +145,8 @@ class ControlerBinairo:
         soluce = helper()
         # self._arrays.clear()
         self._m.setArray(self._soluce)
-        return soluce
+        fin = time.time()
+        return soluce, fin - debut
 
     def getRow(self):
         return self._row

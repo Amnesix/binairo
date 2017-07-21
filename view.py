@@ -78,11 +78,12 @@ class ViewerBinairo(Frame):
 
     def findSoluce(self):
         self.push()
-        if self._c.findSoluce():
+        ret, temps = self._c.findSoluce()
+        if ret:
             self.affiche(self._m.getArray(), None, None, [])
-            self._labelText.set("Solution trouvée :)")
+            self._labelText.set("Solution trouvée en %fs" % temps)
         else:
-            self._labelText.set("Solution impossible :(")
+            self._labelText.set("Solution impossible (%fs)" % temps)
 
     def affiche(self, ar=None, row=None, col=None, errors=[]):
         self._row = self._row if row is None else row
