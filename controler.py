@@ -50,6 +50,8 @@ class ControlerBinairo:
         cols = []
         # Recherche des lignes identiques ou à plus de _dim/2 éléments
         # identiques
+        print("verify")
+        print(self._m)
         for r in range(self._dim):
             if self._m.getNbInRow(r) == self._dim:
                 if len(rows):
