@@ -53,27 +53,28 @@ class ControlerBinairo:
         print("verify")
         print(self._m)
         for r in range(self._dim):
+            print(arr[r], self._m.getNbInRow(r))
             if self._m.getNbInRow(r) == self._dim:
                 if len(rows):
                     for i in rows:
-                        if arr[r] == arr[i]:
+                        if arr[r][0] == arr[i][0]:
                             errors.append(('R', i, r))
                 rows.append(r)
-                try:
-                    if sum(arr[r]) != self._dim // 2:
-                        errors.append(('R', r))
-                except:
-                    pass
-            row = str(arr[r])
+                #try:
+                if modele.nb1(arr[r][0]) != self._dim // 2:
+                    errors.append(('R', r))
+                #except:
+                    #pass
+            row = self._m.getRowStr(r)
             d = None
             # recherche de triplet (ou plus)
             for i in range(self._dim):
-                if d is None and row[i] is not None:
+                if d is None and row[i] != '.':
                     d, v = i, row[i]
                 elif d is not None and v != row[i]:
                     if i - d >= 3:
                         errors.append(('r', r, d, i-1))
-                    d, v = (i, row[i]) if row[i] is not None else (None, 0)
+                    d, v = (i, row[i]) if row[i] != '.' else (None, 0)
                 try:
                     if i - d >= 2:
                         errors.append(('r', r, d, i))
@@ -84,24 +85,24 @@ class ControlerBinairo:
             if self._m.getNbInCol(c) == self._dim:
                 if len(cols):
                     for i in cols:
-                        if arc[c] == arc[i]:
+                        if arc[c][0] == arc[i][0]:
                             errors.append(('C', i, c))
                 cols.append(c)
                 try:
-                    if sum(arc[c]) != self._dim // 2:
+                    if modele.nb1(arc[c][0]) != self._dim // 2:
                         errors.append(('C', c))
                 except:
                     pass
-            col = str(arc[c])
+            col = self._m.getColStr(c)
             d = None
             # recherche de triplet (ou plus)
             for i in range(self._dim):
-                if d is None and col[i] is not None:
+                if d is None and col[i] != '.':
                     d, v = i, col[i]
                 elif d is not None and v != col[i]:
                     if i - d >= 3:
                         errors.append(('c', c, d, i-1))
-                    d, v = (i, col[i]) if col[i] is not None else (None, 0)
+                    d, v = (i, col[i]) if col[i] != '.' else (None, 0)
                 try:
                     if i - d >= 2:
                         errors.append(('c', c, d, i))

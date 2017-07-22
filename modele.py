@@ -13,7 +13,7 @@
 # =============================================
 
 def nb1(value):
-    return sum([int(c) for c in str(value)])
+    return sum([int(c) for c in str(bin(value)[2:])])
 
 class ModeleBinairo:
 
@@ -58,10 +58,10 @@ class ModeleBinairo:
         self._cols = [[0, 0] for _ in range(self._dim)]
 
     def getNbInRow(self, r):
-        return nb1(self._rows[r][0]) - nb1(self._rows[r][1])
+        return nb1(self._rows[r][1])
 
     def getNbInCol(self, c):
-        return nb1(self._cols[c][0]) - nb1(self._cols[c][1])
+        return nb1(self._cols[c][1])
 
     def getNbInArray(self):
         return sum([self.getNbInRow(r) for r in range(self._dim)])
@@ -69,8 +69,18 @@ class ModeleBinairo:
     def getRow(self, r):
         return self._rows[r][0]
 
+    def getRowStr(self, r):
+        return ''.join([('1' if self._rows[r][0] & (1 << c) else '0')
+                        if self._rows[r][1] & (1 << c) else '.'
+                        for c in range(self._dim)])
+
     def getCol(self, c):
         return self._cols[c][0]
+
+    def getColStr(self, c):
+        return ''.join([('1' if self._cols[c][0] & (1 << r) else '0')
+                        if self._cols[c][1] & (1 << r) else '.'
+                        for r in range(self._dim)])
 
     def getRows(self):
         return self._rows
@@ -88,9 +98,10 @@ class ModeleBinairo:
             print("setArray(", ar, ")")
 
     def __str__(self):
-        return '\n'.join([' '.join([str(r[0] & (1 << c)) if r[1] & (1 << c) else '.' 
+        return '\n'.join([' '.join([('1' if r[0] & (1 << c) else '0')
+                                    if r[1] & (1 << c) else '.' 
                                         for c in range(self._dim)])
-                                    for r in self._rows])
+                                    for r in self._cols])
 
 if __name__ == '__main__':
     obj = ModeleBinairo()
