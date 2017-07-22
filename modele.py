@@ -6,9 +6,14 @@
 # ---------------------------------------------
 # modele.py
 # Description du modèle du jeu.
+# ---------------------------------------------
+# Historique
+# V2.0 Remplacement de la table de valeur par
+#      deux tables de mots binaires.
 # =============================================
 
-VALUES = (0, 1)
+def nb1(value):
+    return sum([int(c) for c in str(value)])
 
 class ModeleBinairo:
 
@@ -18,62 +23,77 @@ class ModeleBinairo:
 
     def incRC(self, row, col):
         try:
-            v = self._array[row][col]
-            self._array[row][col] = None if v == 1 else 1 if v == 0 else 0
+            if self._rows[row][1] & (1 << col):
+                if self._rows[row][0] & (1 << col):
+                    self.clearRC(row, col)
+                else:
+                    self.setRC(row, col)
+            else:
+                self.resetRC(row, col)
         except:
             return False
         return True
 
-    def setRC(self, row, col, value):
-        if 0 <= row < self._dim and 0 <= col < self._dim and value in VALUES:
-            self._array[row][col] = value
+    def setRC(self, row, col):
+        if 0 <= row < self._dim and 0 <= col < self._dim:
+            self._rows[row][0] |= 1 << col
+            self._cols[col][0] |= 1 << row
+            self._rows[row][1] |= 1 << col
+            self._cols[col][1] |= 1 << row
 
     def resetRC(self, row, col):
         if 0 <= row < self._dim and 0 <= col < self._dim:
-            self._array[row][col] = None
+            self._rows[row][0] &= ~(1 << col)
+            self._cols[col][0] &= ~(1 << row)
+            self._rows[row][1] |= 1 << col
+            self._cols[col][1] |= 1 << row
+
+    def clearRC(self, row, col):
+        if 0 <= row < self._dim and 0 <= col < self._dim:
+            self._rows[row][1] &= ~(1 << col)
+            self._cols[col][1] &= ~(1 << row)
 
     def clear(self):
-        self._array = [[None]*self._dim for _ in range(self._dim)]
+        self._rows = [[0, 0] for _ in range(self._dim)]
+        self._cols = [[0, 0] for _ in range(self._dim)]
 
     def getNbInRow(self, r):
-        return sum([1 if self._array[r][c] is not None else 0 for c in range(self._dim)])
+        return nb1(self._rows[r][0]) - nb1(self._rows[r][1])
 
     def getNbInCol(self, c):
-        return sum([1 if self._array[r][c] is not None else 0 for r in range(self._dim)])
+        return nb1(self._cols[c][0]) - nb1(self._cols[c][1])
 
     def getNbInArray(self):
         return sum([self.getNbInRow(r) for r in range(self._dim)])
 
     def getRow(self, r):
-        return self._array[r]
+        return self._rows[r][0]
 
     def getCol(self, c):
-        return [r[c] for r in self._array]
+        return self._cols[c][0]
 
     def getRows(self):
-        rows = []
-        for r in range(self._dim):
-            v = 0
-            for c in range(self._dim):
-                v += 1<<c if self._array[r][c] == 1 else 0
-            rows.append(v)
-        return rows
+        return self._rows
 
     def getCols(self):
-        cols = []
-        for c in range(self._dim):
-            v = 0
-            for r in range(self._dim):
-                v += 1<<r if self._array[r][c] == 1 else 0
-            cols.append(v)
-        return cols
+        return self._cols
 
     def getArray(self):
-        return [r[:] for r in self._array]
+        return (self._rows, self._cols)
 
     def setArray(self, ar):
-        self._array = ar
+        try:
+            self._rows, self._cols = ar
+        except ValueError:
+            print("setArray(", ar, ")")
 
     def __str__(self):
-        return [' '+' '.join(['.' if c is None else str(c) for c in row])+' '
-                for row in self._array]
+        return '\n'.join([' '.join([str(r[0] & (1 << c)) if r[1] & (1 << c) else '.' 
+                                        for c in range(self._dim)])
+                                    for r in self._rows])
+
+if __name__ == '__main__':
+    obj = ModeleBinairo()
+    obj.clear()
+    print(obj._rows)
+    print(obj)

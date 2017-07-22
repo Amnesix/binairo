@@ -28,7 +28,6 @@ class ViewerBinairo(Frame):
         self.initUI()
 
     def initUI(self):
-        self._arrays = []
         self._parent.title("Binairo")
         self.pack(fill=BOTH, expand=True)
         self._canvas = Canvas(self, width=16+CASE*self._dim,
@@ -61,7 +60,6 @@ class ViewerBinairo(Frame):
     def clear(self):
         self._m.clear()
         self.affiche()
-        self._arrays.clear()
 
     def push(self):
         self._c.push()
@@ -71,6 +69,7 @@ class ViewerBinairo(Frame):
             self.affiche(self._m.getArray())
 
     def onMouseClick(self, evt):
+        # Calcul de la case clickée
         row = (evt.x - OFFSET) // CASE
         col = (evt.y - OFFSET) // CASE
         if self._c.modify(row=row, col=col):
@@ -131,16 +130,17 @@ class ViewerBinairo(Frame):
                                      OFFSET+CASE*self._dim)
         # Affichage des pièces.
         if ar is not None:
-            for r in range(len(ar)):
-                for c in range(len(ar[r])):
-                    v = ar[r][c]
+            rows, cols = ar
+            for r in range(self._dim):
+                for c in range(self._dim):
+                    v = rows[r][0] & (1 << c) if rows[r][1] & (1 << c) else -1
                     if v == 0:
                         self._canvas.create_oval(OFFSET+r*CASE+8,
                                                  OFFSET+c*CASE+8,
                                                  OFFSET+r*CASE+CASE-8,
                                                  OFFSET+c*CASE+CASE-8,
                                                  width=5, outline='blue')
-                    elif v == 1:
+                    elif v != -1:
                         self._canvas.create_line(OFFSET+r*CASE+CASE//2,
                                                  OFFSET+c*CASE+6,
                                                  OFFSET+r*CASE+CASE//2,

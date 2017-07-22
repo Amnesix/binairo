@@ -45,25 +45,26 @@ class ControlerBinairo:
         ainsi que de retourner la liste des erreurs.
         """
         errors = []
-        ar = self._m.getArray()
-        cols = []
+        arr, arc = self._m.getArray()
         rows = []
+        cols = []
         # Recherche des lignes identiques ou à plus de _dim/2 éléments
         # identiques
         for r in range(self._dim):
-            if sum([1 if c is not None else 0 for c in ar[r]]) == self._dim:
+            if self._m.getNbInRow(r) == self._dim:
                 if len(rows):
                     for i in rows:
-                        if ar[r] == ar[i]:
+                        if arr[r] == arr[i]:
                             errors.append(('R', i, r))
                 rows.append(r)
                 try:
-                    if sum(ar[r]) != self._dim // 2:
+                    if sum(arr[r]) != self._dim // 2:
                         errors.append(('R', r))
                 except:
                     pass
-            row = self._m.getRow(r)
+            row = str(arr[r])
             d = None
+            # recherche de triplet (ou plus)
             for i in range(self._dim):
                 if d is None and row[i] is not None:
                     d, v = i, row[i]
@@ -77,21 +78,21 @@ class ControlerBinairo:
                 except:
                     pass
         # Recherche des colonnes identiques
-        COLS = self._m.getCols()
         for c in range(self._dim):
-            if sum([1 if ar[r][c] is not None else 0 for r in range(self._dim)]) == self._dim:
+            if self._m.getNbInCol(c) == self._dim:
                 if len(cols):
                     for i in cols:
-                        if COLS[c] == COLS[i]:
+                        if arc[c] == arc[i]:
                             errors.append(('C', i, c))
                 cols.append(c)
                 try:
-                    if sum([ar[r][c] for r in range(self._dim)]) != self._dim // 2:
+                    if sum(arc[c]) != self._dim // 2:
                         errors.append(('C', c))
                 except:
                     pass
-            col = self._m.getCol(c)
+            col = str(arc[c])
             d = None
+            # recherche de triplet (ou plus)
             for i in range(self._dim):
                 if d is None and col[i] is not None:
                     d, v = i, col[i]
@@ -112,7 +113,7 @@ class ControlerBinairo:
 
     def pop(self):
         if len(self._arrays) > 0:
-            self._m.setArray([r[:] for r in self._arrays.pop()])
+            self._m.setArray(self._arrays.pop())
             return True
         return False
 
@@ -126,10 +127,10 @@ class ControlerBinairo:
             if self._m.getNbInArray() == self._dim ** 2:
                 self._soluce = self._m.getArray()
                 return True
-            ar = self._m.getArray()
+            arr, arc = self._m.getArray()
             for r in range(self._dim):
                 for c in range(self._dim):
-                    if ar[r][c] == None:
+                    if arr[r][1] & (1 << c) == 0:
                         self.push()
                         self.modify(r, c)
                         if helper():
