@@ -89,11 +89,11 @@ class ModeleBinairo:
         return self._cols
 
     def getArray(self):
-        return (self._rows, self._cols)
+        return ([l.copy() for l in self._rows], [l.copy() for l in self._cols])
 
     def setArray(self, ar):
         try:
-            self._rows, self._cols = ar
+            self._rows, self._cols = [l[:] for l in ar[0]], [l[:] for l in ar[1]]
         except ValueError:
             print("setArray(", ar, ")")
 

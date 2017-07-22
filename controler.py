@@ -50,10 +50,10 @@ class ControlerBinairo:
         cols = []
         # Recherche des lignes identiques ou à plus de _dim/2 éléments
         # identiques
-        print("verify")
-        print(self._m)
+        # print("verify")
+        # print(self._m)
         for r in range(self._dim):
-            print(arr[r], self._m.getNbInRow(r))
+            # print(arr[r], self._m.getNbInRow(r))
             if self._m.getNbInRow(r) == self._dim:
                 if len(rows):
                     for i in rows:
@@ -147,8 +147,10 @@ class ControlerBinairo:
                         return False
         self.push()
         soluce = helper()
-        # self._arrays.clear()
-        self._m.setArray(self._soluce)
+        # self._arrays.clear())
+        # print(soluce, self._soluce)
+        if soluce:
+            self._m.setArray((self._soluce[0].copy(), self._soluce[1].copy()))
         fin = time.time()
         return soluce, fin - debut
 
