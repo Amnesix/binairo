@@ -72,7 +72,7 @@ class ViewerBinairo(Frame):
         # Calcul de la case clickée
         row = (evt.x - OFFSET) // CASE
         col = (evt.y - OFFSET) // CASE
-        if self._c.modify(row=row, col=col):
+        if 0 <= row < self._dim and 0 <= col < self._dim and self._c.modify(row=row, col=col):
             self.affiche(self._m.getArray(), row, col, self._c.verify())
 
     def findSoluce(self):

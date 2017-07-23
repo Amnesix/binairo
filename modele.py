@@ -105,10 +105,10 @@ class ModeleBinairo:
             print("setArray(", ar, ")")
 
     def __str__(self):
-        return '\n'.join([' '.join([('1' if r[0] & (1 << c) else '0')
-                                    if r[1] & (1 << c) else '.' 
-                                        for c in range(self._dim)])
-                                    for r in self._cols])
+        return ' '+ '\n '.join([' '.join([('1' if r[0] & (1 << c) else '0')
+                                          if r[1] & (1 << c) else '.' 
+                                          for c in range(self._dim)])
+                                          for r in self._cols])+'\n-'+'-'*self._dim*2
 
 if __name__ == '__main__':
     obj = ModeleBinairo()

@@ -90,50 +90,56 @@ class ControlerBinairo:
         """ Recherche d'une solution par force brute """
         debut = time.time()
         self._soluce = []
-        @Memoize
-        def testRC(string):
-            return re.search(r"000|111", string) is not None
+
         def helper():
+            @Memoize
+            def testRC(string):
+                return re.search(r"000|111", string) is not None
+
+            def testMod(r, c):
+                # Vérifier si le coup provoque l'apparition d'un triplet
+                # (ou +)
+                sr = self._m.getRowStr(r)
+                sc = self._m.getColStr(c)
+                if testRC(sr) or testRC(sc):
+                    return False, 1
+                # Si ligne (ou colonne) pleine, vérifier si doublon
+                if '.' not in sr:
+                    if sum([int(c) for c in sr]) != self._dim // 2:
+                        return False, 2
+                    for i in range(self._dim):
+                        if i != r and self._m._rows[i][0] == self._m._rows[r][0]:
+                            return False, 3
+                if '.' not in sc:
+                    if sum([int(c) for c in sc]) != self._dim // 2:
+                        return False, 4
+                    for i in range(self._dim):
+                        if i != c and self._m._cols[i][0] == self._m._cols[c][0]:
+                            return False, 5
+                return True, 0
+
             if self._m.getNbInArray() == self._dim ** 2:
                 self._soluce = self._m.getArray()
                 return True
             for r in range(self._dim):
                 for c in range(self._dim):
                     if self._m._rows[r][1] & (1 << c) == 0:
+                        # case non jouée
                         self.push()
+                        # On commence par tester avec 0
                         self.modify(r, c)
-                        # Vérifier si le coup provoque l'apparition d'un triplet
-                        # (ou +)
-                        sr = self._m.getRowStr(r)
-                        sc = self._m.getColStr(c)
-                        if testRC(sr) or testRC(sc):
-                            self.pop()
-                            return False
-                        # Si ligne (ou colonne) pleine, vérifier si doublon
-                        if '.' not in sr:
-                            if sum([1 if c == '1' else 0 for c in sr]) != self._dim // 2:
+                        ret, num = testMod(r, c)
+                        if ret:
+                            if helper():
                                 self.pop()
-                                return False
-                            for i in range(self._dim):
-                                if i != r and self._m._rows[i][0] == self._m._rows[r][0]:
-                                    self.pop()
-                                    return False
-                            print(sr)
-                        if '.' not in sc:
-                            if sum([1 if c == '1' else 0 for c in sc]) != self._dim // 2:
-                                self.pop()
-                                return False
-                            for i in range(self._dim):
-                                if i != c and self._m._cols[i][0] == self._m._cols[c][0]:
-                                    self.pop()
-                                    return False
-                        if helper():
-                            self.pop()
-                            return True
+                                return True
+                        # On teste maintenant avec 1
                         self.modify(r, c)
-                        if helper():
-                            self.pop()
-                            return True
+                        ret, num = testMod(r, c)
+                        if ret:
+                            if helper():
+                                self.pop()
+                                return True
                         self.pop()
                         return False
         self.push()
