@@ -12,6 +12,8 @@
 # =============================================
 import modele
 import time
+from memoize import *
+import re
 
 
 class ControlerBinairo:
@@ -44,71 +46,35 @@ class ControlerBinairo:
         Fonction permettant de vérifier si un grille est correct
         ainsi que de retourner la liste des erreurs.
         """
+        exp = r"0{3,5}|1{3,5}"
         errors = []
-        arr, arc = self._m.getArray()
-        rows = []
-        cols = []
-        # Recherche des lignes identiques ou à plus de _dim/2 éléments
-        # identiques
-        # print("verify")
-        # print(self._m)
-        for r in range(self._dim):
-            # print(arr[r], self._m.getNbInRow(r))
-            if self._m.getNbInRow(r) == self._dim:
-                if len(rows):
-                    for i in rows:
-                        if arr[r][0] == arr[i][0]:
-                            errors.append(('R', i, r))
-                rows.append(r)
-                #try:
-                if modele.nb1(arr[r][0]) != self._dim // 2:
-                    errors.append(('R', r))
-                #except:
-                    #pass
-            row = self._m.getRowStr(r)
-            d = None
-            # recherche de triplet (ou plus)
-            for i in range(self._dim):
-                if d is None and row[i] != '.':
-                    d, v = i, row[i]
-                elif d is not None and v != row[i]:
-                    if i - d >= 3:
-                        errors.append(('r', r, d, i-1))
-                    d, v = (i, row[i]) if row[i] != '.' else (None, 0)
-                try:
-                    if i - d >= 2:
-                        errors.append(('r', r, d, i))
-                except:
-                    pass
-        # Recherche des colonnes identiques
-        for c in range(self._dim):
-            if self._m.getNbInCol(c) == self._dim:
-                if len(cols):
-                    for i in cols:
-                        if arc[c][0] == arc[i][0]:
-                            errors.append(('C', i, c))
-                cols.append(c)
-                try:
-                    if modele.nb1(arc[c][0]) != self._dim // 2:
-                        errors.append(('C', c))
-                except:
-                    pass
-            col = self._m.getColStr(c)
-            d = None
-            # recherche de triplet (ou plus)
-            for i in range(self._dim):
-                if d is None and col[i] != '.':
-                    d, v = i, col[i]
-                elif d is not None and v != col[i]:
-                    if i - d >= 3:
-                        errors.append(('c', c, d, i-1))
-                    d, v = (i, col[i]) if col[i] != '.' else (None, 0)
-                try:
-                    if i - d >= 2:
-                        errors.append(('c', c, d, i))
-                except:
-                    pass
-        # Recherche d'éventuels triplets
+        rows = self._m.getRows()
+        cols = self._m.getCols()
+        for val in range(self._dim):
+            # Recherche d'éventuels triplets
+            strrow = self._m.getRowStr(val)
+            ret = re.search(exp, strrow)
+            if ret:
+                ret = ret.span()
+                errors.append(('r', val, ret[0], ret[1]))
+            strcol = self._m.getColStr(val)
+            ret = re.search(exp, strcol)
+            if ret:
+                ret = ret.span()
+                errors.append(('c', val, ret[0], ret[1]))
+            # Recherche de colonnes et lignes identiques:
+            if self._m.getNbInRow(val) == self._dim:
+                if sum([c == '1' for c in strrow]) != self._dim // 2:
+                    errors.append(('R', val))
+                for i in range(val+1, self._dim):
+                    if rows[val][0] == rows[i][0]:
+                        errors.append(('R', val, i))
+            if self._m.getNbInCol(val) == self._dim:
+                if sum([c == '1' for c in strcol]) != self._dim // 2:
+                    errors.append(('C', val))
+                for i in range(val+1, self._dim):
+                    if cols[val][0] == cols[i][0]:
+                        errors.append(('C', val, i))
         return errors
 
     def push(self):
@@ -124,18 +90,43 @@ class ControlerBinairo:
         """ Recherche d'une solution par force brute """
         debut = time.time()
         self._soluce = []
+        @Memoize
+        def testRC(string):
+            return re.search(r"000|111", string) is not None
         def helper():
-            if len(self.verify()) > 0:
-                return False
             if self._m.getNbInArray() == self._dim ** 2:
                 self._soluce = self._m.getArray()
                 return True
-            arr, arc = self._m.getArray()
             for r in range(self._dim):
                 for c in range(self._dim):
-                    if arr[r][1] & (1 << c) == 0:
+                    if self._m._rows[r][1] & (1 << c) == 0:
                         self.push()
                         self.modify(r, c)
+                        # Vérifier si le coup provoque l'apparition d'un triplet
+                        # (ou +)
+                        sr = self._m.getRowStr(r)
+                        sc = self._m.getColStr(c)
+                        if testRC(sr) or testRC(sc):
+                            self.pop()
+                            return False
+                        # Si ligne (ou colonne) pleine, vérifier si doublon
+                        if '.' not in sr:
+                            if sum([1 if c == '1' else 0 for c in sr]) != self._dim // 2:
+                                self.pop()
+                                return False
+                            for i in range(self._dim):
+                                if i != r and self._m._rows[i][0] == self._m._rows[r][0]:
+                                    self.pop()
+                                    return False
+                            print(sr)
+                        if '.' not in sc:
+                            if sum([1 if c == '1' else 0 for c in sc]) != self._dim // 2:
+                                self.pop()
+                                return False
+                            for i in range(self._dim):
+                                if i != c and self._m._cols[i][0] == self._m._cols[c][0]:
+                                    self.pop()
+                                    return False
                         if helper():
                             self.pop()
                             return True

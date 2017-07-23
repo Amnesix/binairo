@@ -108,12 +108,12 @@ class ViewerBinairo(Frame):
                     self._canvas.create_rectangle(OFFSET+tt[1]*CASE+1,
                                                   OFFSET+tt[2]*CASE+1,
                                                   OFFSET+tt[1]*CASE+CASE,
-                                                  OFFSET+tt[3]*CASE+CASE,
+                                                  OFFSET+tt[3]*CASE,
                                                   fill=LIGHTRED, width=0)
                 elif tt[0] == 'c':
                     self._canvas.create_rectangle(OFFSET+tt[2]*CASE+1,
                                                   OFFSET+tt[1]*CASE+1,
-                                                  OFFSET+tt[3]*CASE+CASE,
+                                                  OFFSET+tt[3]*CASE,
                                                   OFFSET+tt[1]*CASE+CASE,
                                                   fill=LIGHTRED, width=0)
         # Affichage du curseur

@@ -11,9 +11,13 @@
 # V2.0 Remplacement de la table de valeur par
 #      deux tables de mots binaires.
 # =============================================
+from copy import deepcopy
+from memoize import Memoize
+
 
 def nb1(value):
     return sum([int(c) for c in str(bin(value)[2:])])
+
 
 class ModeleBinairo:
 
@@ -69,18 +73,20 @@ class ModeleBinairo:
     def getRow(self, r):
         return self._rows[r][0]
 
-    def getRowStr(self, r):
-        return ''.join([('1' if self._rows[r][0] & (1 << c) else '0')
-                        if self._rows[r][1] & (1 << c) else '.'
+    @Memoize
+    def val2str(self, a, b):
+        return ''.join([('1' if a & (1 << c) else '0')
+                        if b & (1 << c) else '.'
                         for c in range(self._dim)])
+
+    def getRowStr(self, r):
+        return self.val2str(self._rows[r][0], self._rows[r][1])
 
     def getCol(self, c):
         return self._cols[c][0]
 
     def getColStr(self, c):
-        return ''.join([('1' if self._cols[c][0] & (1 << r) else '0')
-                        if self._cols[c][1] & (1 << r) else '.'
-                        for r in range(self._dim)])
+        return self.val2str(self._cols[c][0], self._cols[c][1])
 
     def getRows(self):
         return self._rows
@@ -89,11 +95,12 @@ class ModeleBinairo:
         return self._cols
 
     def getArray(self):
-        return ([l.copy() for l in self._rows], [l.copy() for l in self._cols])
+        return deepcopy(self._rows), deepcopy(self._cols)
 
     def setArray(self, ar):
         try:
-            self._rows, self._cols = [l[:] for l in ar[0]], [l[:] for l in ar[1]]
+            self._rows = deepcopy(ar[0])
+            self._cols = deepcopy(ar[1])
         except ValueError:
             print("setArray(", ar, ")")
 
