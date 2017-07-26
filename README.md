@@ -21,6 +21,16 @@ La recherche de la validité d'un coup devrait commencer par la position du coup
 Inutile de vérifier le reste de la grille car il ne devrait pas y avoir d'autres
 erreurs. Sinon, il y a un bug dans la vérification !
 
+Ne plus utiliser de chaine de caractères : Il faut revoir la recherche des
+triplets. Pour les colonnes ou lignes identiques, aucun problème.  
+Soit a la valeur d'un colonne et b la valeur des cases renseignées.  
+a donne directement la liste des bits à 1.  
+<pre>(a & ((1<<dim)-1)^b</pre> donne la liste des bits à 0.
+La recherche de triplets peut se faire ensuite par un masque de chaque valeurs
+avec 7 et shift à droite de 1 dim-2 fois.  
+Bien évidemment, ceci ne concerne que la recherche de solution. Dans le cas de
+la vérification en cours de jeu, le temps de calcul importe peu.
+
 Utilisation de la mémoïsation
 -----------------------------
 On peut gagner pas mal de temps en utilisation la mémoïsation sur l'ajout d'une

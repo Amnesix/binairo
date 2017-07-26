@@ -25,6 +25,7 @@ class ControlerBinairo:
         self._row = 0
         self._col = 0
         self._arrays = []
+        self._compl = (1 << dim) - 1
 
     def up(self):
         self._col = (self._col + self._dim - 1) % self._dim
@@ -92,59 +93,74 @@ class ControlerBinairo:
         debut = time.time()
         self._soluce = []
 
-        def helper():
+        def helper(row, col):
             @Memoize
-            def testRC(string):
-                return re.search(r"000|111", string) is not None
+            def rechTriplet(value):
+                for i in range(self._dim-2):
+                    if (value >> i) & 7 == 7:
+                        return True
+                return False
 
             def testMod(r, c):
                 # Vérifier si le coup provoque l'apparition d'un triplet
                 # (ou +)
                 sr = self._m.getRowStr(r)
                 sc = self._m.getColStr(c)
-                if testRC(sr) or testRC(sc):
+                rm = self._m._rows[r][1]
+                r1 = self._m._rows[r][0]
+                r0 = (r1 ^ self._compl) & rm
+                cm = self._m._cols[c][1]
+                c1 = self._m._cols[c][0]
+                c0 = (c1 ^ self._compl) & cm
+                if rechTriplet(r1) or rechTriplet(r0):
+                    return False, 1
+                if rechTriplet(c1) or rechTriplet(c0):
                     return False, 1
                 # Si ligne (ou colonne) pleine, vérifier si doublon
-                if '.' not in sr:
-                    if sum([int(c) for c in sr]) != self._dim // 2:
+                if rm ^ self._compl == 0:
+                    if modele.nb1(r1) != self._dim // 2:
                         return False, 2
                     for i in range(self._dim):
-                        if i != r and self._m._rows[i][0] == self._m._rows[r][0]:
+                        if i != r and self._m._rows[i][0] == r1:
                             return False, 3
-                if '.' not in sc:
-                    if sum([int(c) for c in sc]) != self._dim // 2:
+                if cm ^ self._compl == 0:
+                    if modele.nb1(c1) != self._dim // 2:
                         return False, 4
                     for i in range(self._dim):
-                        if i != c and self._m._cols[i][0] == self._m._cols[c][0]:
+                        if i != c and self._m._cols[i][0] == c1:
                             return False, 5
                 return True, 0
-
+            # Si tout est rempli, c'est la solution !
             if self._m.getNbInArray() == self._dim ** 2:
                 self._soluce = self._m.getArray()
                 return True
-            for r in range(self._dim):
+            # Recherche des cases non jouées.
+            for r in range(row, self._dim):
                 for c in range(self._dim):
                     if self._m._rows[r][1] & (1 << c) == 0:
                         # case non jouée
+                        #print('>>>\n%s' % self._m)
                         self.push()
                         # On commence par tester avec 0
                         self.modify(r, c)
                         ret, num = testMod(r, c)
                         if ret:
-                            if helper():
+                            if helper(r, c):
                                 self.pop()
                                 return True
                         # On teste maintenant avec 1
                         self.modify(r, c)
                         ret, num = testMod(r, c)
                         if ret:
-                            if helper():
+                            if helper(r, c):
                                 self.pop()
                                 return True
                         self.pop()
+                        #self.modify(r, c)
+                        #print('<<<\n%s' % self._m)
                         return False
         self.push()
-        soluce = helper()
+        soluce = helper(0, 0)
         # self._arrays.clear())
         # print(soluce, self._soluce)
         if soluce:

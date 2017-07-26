@@ -24,10 +24,7 @@ def nb1c(value):
     return c
 
 NB1 = array('I', [nb1c(x) for x in range(2**12)])
-
-
-def nb1(value):
-    return NB1[value]
+nb1 = lambda value: NB1[value]
 
 
 class ModeleBinairo:
@@ -118,6 +115,6 @@ class ModeleBinairo:
 
     def __str__(self):
         return ' '+ '\n '.join([' '.join([('1' if r[0] & (1 << c) else '0')
-                                          if r[1] & (1 << c) else '.' 
+                                          if r[1] & (1 << c) else '.'
                                           for c in range(self._dim)])
                                           for r in self._cols])+'\n-'+'-'*self._dim*2
