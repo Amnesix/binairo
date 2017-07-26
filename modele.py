@@ -13,10 +13,21 @@
 # =============================================
 from copy import deepcopy
 from memoize import Memoize
+from array import array
+
+
+def nb1c(value):
+    c = 0
+    while value:
+        c += value & 1
+        value >>= 1
+    return c
+
+NB1 = array('I', [nb1c(x) for x in range(2**12)])
 
 
 def nb1(value):
-    return sum([int(c) for c in str(bin(value)[2:])])
+    return NB1[value]
 
 
 class ModeleBinairo:
@@ -73,17 +84,18 @@ class ModeleBinairo:
     def getRow(self, r):
         return self._rows[r][0]
 
+    def getCol(self, c):
+        return self._cols[c][0]
+
     @Memoize
     def val2str(self, a, b):
+        """Conversion d'une ligne ou d'une colonne en chaine."""
         return ''.join([('1' if a & (1 << c) else '0')
                         if b & (1 << c) else '.'
                         for c in range(self._dim)])
 
     def getRowStr(self, r):
         return self.val2str(self._rows[r][0], self._rows[r][1])
-
-    def getCol(self, c):
-        return self._cols[c][0]
 
     def getColStr(self, c):
         return self.val2str(self._cols[c][0], self._cols[c][1])
@@ -102,16 +114,10 @@ class ModeleBinairo:
             self._rows = deepcopy(ar[0])
             self._cols = deepcopy(ar[1])
         except ValueError:
-            print("setArray(", ar, ")")
+            print("Error: setArray(", ar, ")")
 
     def __str__(self):
         return ' '+ '\n '.join([' '.join([('1' if r[0] & (1 << c) else '0')
                                           if r[1] & (1 << c) else '.' 
                                           for c in range(self._dim)])
                                           for r in self._cols])+'\n-'+'-'*self._dim*2
-
-if __name__ == '__main__':
-    obj = ModeleBinairo()
-    obj.clear()
-    print(obj._rows)
-    print(obj)

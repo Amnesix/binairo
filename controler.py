@@ -9,6 +9,7 @@
 # Met à jour le modèle.
 # Vérifie les erreurs.
 # Indique la fin du jeu.
+# Recheche d'une solution.
 # =============================================
 import modele
 import time
