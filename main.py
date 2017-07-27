@@ -13,6 +13,7 @@ from controler import ControlerBinairo
 from view import ViewerBinairo
 from tkinter import *
 import sys
+import cProfile
 
 DIM = 6
 
@@ -74,4 +75,5 @@ if __name__ == "__main__":
     if not dim in [6, 8, 10, 12]:
         print("Le paramètre doit être 6, 8, 10 ou 12")
     else:
+        #cProfile.run('main(dim)')
         main(dim)

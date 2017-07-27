@@ -27,6 +27,7 @@ class ControlerBinairo:
         self._col = 0
         self._arrays = []
         self._compl = (1 << dim) - 1
+        self._memo = {}
 
     def up(self):
         self._col = (self._col + self._dim - 1) % self._dim
@@ -95,12 +96,13 @@ class ControlerBinairo:
         self._soluce = []
 
         def helper(row, col):
-            @Memoize
             def rechTriplet(value):
-                for i in range(self._dim-2):
-                    if (value >> i) & 7 == 7:
-                        return True
-                return False
+                if value not in self._memo:
+                    self._memo[value] = False
+                    for i in range(self._dim-2):
+                        if (value >> i) & 7 == 7:
+                            self._memo[value] = True
+                return self._memo[value]
 
             def testMod(r, c):
                 # Vérifier si le coup provoque l'apparition d'un triplet
@@ -131,14 +133,12 @@ class ControlerBinairo:
                             return False, 5
                 return True, 0
             def testCase(r, c):
-                #self.push()
                 # On commence par tester avec 0
                 self._m.resetRC(r, c)
                 #print("test 0 en %d,%d :\n%s" % (r, c, self._m))
                 ret, num = testMod(r, c)
                 if ret:
                     if helper(r, c):
-                        #self.pop()
                         return True
                 # On teste maintenant avec 1
                 self._m.setRC(r, c)
@@ -146,12 +146,10 @@ class ControlerBinairo:
                 ret, num = testMod(r, c)
                 if ret:
                     if helper(r, c):
-                        #self.pop()
                         return True
                 # On remet tout à 0 dans cette case.
                 self._m.clearRC(r, c)
                 #print("Retour en %d,%d (%d) :\n%s" % (r, c, num, self._m))
-                #self.pop()
                 #print('pop')
                 #print(self._m)
                 return False
