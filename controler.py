@@ -16,6 +16,7 @@ import time
 from memoize import *
 import re
 
+invBin = lambda x: ''.join([c for c in bin(x)[:1:-1]])
 
 class ControlerBinairo:
 
@@ -104,8 +105,6 @@ class ControlerBinairo:
             def testMod(r, c):
                 # Vérifier si le coup provoque l'apparition d'un triplet
                 # (ou +)
-                sr = self._m.getRowStr(r)
-                sc = self._m.getColStr(c)
                 rm = self._m._rows[r][1]
                 r1 = self._m._rows[r][0]
                 r0 = (r1 ^ self._compl) & rm
@@ -113,9 +112,10 @@ class ControlerBinairo:
                 c1 = self._m._cols[c][0]
                 c0 = (c1 ^ self._compl) & cm
                 if rechTriplet(r1) or rechTriplet(r0):
-                    return False, 1
+                    #print('1 :', invBin(r1), '- 0 :', invBin(r0))
+                    return False, 10
                 if rechTriplet(c1) or rechTriplet(c0):
-                    return False, 1
+                    return False, 11
                 # Si ligne (ou colonne) pleine, vérifier si doublon
                 if rm ^ self._compl == 0:
                     if modele.nb1(r1) != self._dim // 2:
@@ -130,35 +130,40 @@ class ControlerBinairo:
                         if i != c and self._m._cols[i][0] == c1:
                             return False, 5
                 return True, 0
-            # Si tout est rempli, c'est la solution !
+            def testCase(r, c):
+                #self.push()
+                # On commence par tester avec 0
+                self._m.resetRC(r, c)
+                #print("test 0 en %d,%d :\n%s" % (r, c, self._m))
+                ret, num = testMod(r, c)
+                if ret:
+                    if helper(r, c):
+                        #self.pop()
+                        return True
+                # On teste maintenant avec 1
+                self._m.setRC(r, c)
+                #print("test 1 en %d,%d (%d) :\n%s" % (r, c, num, self._m))
+                ret, num = testMod(r, c)
+                if ret:
+                    if helper(r, c):
+                        #self.pop()
+                        return True
+                # On remet tout à 0 dans cette case.
+                self._m.clearRC(r, c)
+                #print("Retour en %d,%d (%d) :\n%s" % (r, c, num, self._m))
+                #self.pop()
+                #print('pop')
+                #print(self._m)
+                return False
+            # 1- Si tout est rempli, c'est la solution !
             if self._m.getNbInArray() == self._dim ** 2:
                 self._soluce = self._m.getArray()
                 return True
-            # Recherche des cases non jouées.
+            # 2- Recherche des cases non jouées.
             for r in range(row, self._dim):
                 for c in range(self._dim):
                     if self._m._rows[r][1] & (1 << c) == 0:
-                        # case non jouée
-                        #print('>>>\n%s' % self._m)
-                        self.push()
-                        # On commence par tester avec 0
-                        self.modify(r, c)
-                        ret, num = testMod(r, c)
-                        if ret:
-                            if helper(r, c):
-                                self.pop()
-                                return True
-                        # On teste maintenant avec 1
-                        self.modify(r, c)
-                        ret, num = testMod(r, c)
-                        if ret:
-                            if helper(r, c):
-                                self.pop()
-                                return True
-                        self.pop()
-                        #self.modify(r, c)
-                        #print('<<<\n%s' % self._m)
-                        return False
+                        return testCase(r, c)
         self.push()
         soluce = helper(0, 0)
         # self._arrays.clear())

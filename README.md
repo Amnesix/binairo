@@ -31,6 +31,10 @@ avec 7 et shift à droite de 1 dim-2 fois.
 Bien évidemment, ceci ne concerne que la recherche de solution. Dans le cas de
 la vérification en cours de jeu, le temps de calcul importe peu.
 
+Grace à la suppression de l'usage de chaînes de caractères, le temps de calcul
+d'une solution à partir d'une grille vide de 10x10 passe de plus de 20mn à 3mn
+et 20s environ !
+
 Utilisation de la mémoïsation
 -----------------------------
 On peut gagner pas mal de temps en utilisation la mémoïsation sur l'ajout d'une

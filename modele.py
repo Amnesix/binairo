@@ -62,6 +62,8 @@ class ModeleBinairo:
 
     def clearRC(self, row, col):
         if 0 <= row < self._dim and 0 <= col < self._dim:
+            self._rows[row][0] &= ~(1 << col)
+            self._cols[col][0] &= ~(1 << row)
             self._rows[row][1] &= ~(1 << col)
             self._cols[col][1] &= ~(1 << row)
 
