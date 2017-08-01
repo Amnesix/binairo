@@ -47,8 +47,9 @@ class ControlerBinairo:
 
     def verify(self):
         """
-        Fonction permettant de vérifier si un grille est correct
-        ainsi que de retourner la liste des erreurs.
+        Fonction permettant 
+        - de vérifier si une grille est correct ;
+        - de retourner la liste des erreurs.
         """
         exp = r"0{3,5}|1{3,5}"
         errors = []
